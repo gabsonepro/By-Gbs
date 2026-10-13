@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>By Gbs - Premium TV & Mobile</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-dark: #050508;
+            --bg-card: rgba(22, 22, 34, 0.75);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --primary: #f43f5e;
+            --primary-bright: #ff124d;
+            --primary-glow: rgba(255, 18, 77, 0.5);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --sidebar-width: 290px;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --card-radius: 18px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: #000000 !important;
+            color: var(--text-main);
+            overflow-x: hidden;
+            height: 100vh;
+            width: 100vw;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(244, 63, 94, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 40%);
+        }
+
+        .focusable {
+            outline: none;
+            transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+            border: 2px solid transparent;
+        }
+
+        .focusable:focus, .focusable.focused {
+            transform: scale(1.04);
+            border-color: var(--primary-bright) !important;
+            box-shadow: 0 0 30px var(--primary-glow), 0 10px 25px rgba(0,0,0,0.5) !important;
+            background-color: var(--bg-hover) !important;
+            z-index: 20;
+        }
+
+        #login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            width: 100vw;
+            background: radial-gradient(circle at center, #180913 0%, #050508 100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .login-card {
+            background: rgba(15, 15, 26, 0.85);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2.5rem 2rem;
+            border-radius: 28px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(244, 63, 94, 0.15);
+            text-align: center;
+            margin: auto;
+        }
+
+        /* CONTENEUR QUI MASQUE LES BORDS CARRÉS NOIRS */
+        .logo-container {
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 1.5rem auto;
+            border-radius: 30px;
+            overflow: hidden; /* Coupe tout ce qui dépasse pour ne garder que le centre */
+            box-shadow: 0 0 25px rgba(255, 18, 77, 0.7);
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.35); /* Zoom pour écarter le noir des bords */
+        }
+
+        .login-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(8, 8, 14, 0.8);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ff124d, #be123c);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-demo {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #e2e8f0;
+        }
+
+        #app-screen {
+            display: none;
+            height: 100vh;
+            grid-template-columns: var(--sidebar-width) 1fr;
+        }
+
+        .sidebar {
+            background: rgba(10, 10, 16, 0.9);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.2rem;
+        }
+
+        .app-header-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 2.2rem;
+        }
+
+        .app-header-logo-container {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(255, 18, 77, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-header-logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.35);
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            margin: 1.5rem 0 0.8rem 1rem;
+            font-weight: 700;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 1.1rem 1.4rem;
+            color: var(--text-muted);
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 18, 77, 0.15);
+            color: #fff;
+            border-left: 4px solid var(--primary-bright);
+        }
+
+        .user-info {
+            margin-top: auto;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.1rem;
+            border-radius: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--glass-border);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-rows: 80px 1fr;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 3rem;
+            background: rgba(8, 8, 14, 0.4);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .search-box {
+            position: relative;
+            width: 420px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.85rem 1.4rem 0.85rem 3.2rem;
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            background: rgba(18, 18, 28, 0.8);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1.3rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr;
+            overflow: hidden;
+            padding: 2rem 3rem;
+        }
+
+        .movies-grid-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            letter-spacing: -0.5px;
+        }
+
+        .category-select {
+            padding: 0.8rem 1.4rem;
+            background: rgba(22, 22, 34, 0.9);
+            color: white;
+            font-size: 1rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            outline: none;
+            font-weight: 600;
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            overflow-y: auto;
+            padding: 10px 5px;
+            flex: 1;
+        }
+
+        .movie-card {
+            background: var(--bg-card);
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            aspect-ratio: 2 / 3;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #12121a;
+        }
+
+        .movie-info-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(5, 5, 8, 0.98) 10%, rgba(5, 5, 8, 0.8) 60%, transparent 100%);
+            padding: 1.2rem 0.8rem 0.8rem 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .movie-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .movie-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .movie-badge {
+            background: rgba(244, 63, 94, 0.2);
+            color: var(--primary-bright);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        #player-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 1000;
+        }
+
+        #video-player {
+            width: 100%;
+            height: 100%;
+        }
+
+        .close-player-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            #app-screen {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 65px;
+                height: 100vh;
+            }
+
+            .sidebar {
+                grid-row: 2;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                padding: 0.5rem;
+                border-right: none;
+                border-top: 1px solid var(--glass-border);
+                background: #0a0a10;
+                z-index: 50;
+            }
+
+            .app-header-logo, .nav-section-title, .user-info {
+                display: none;
+            }
+
+            .nav-item {
+                flex-direction: column;
+                gap: 4px;
+                padding: 0.5rem;
+                font-size: 0.75rem;
+                margin-bottom: 0;
+                border-radius: 10px;
+                text-align: center;
+            }
+
+            .nav-item i {
+                font-size: 1.2rem;
+            }
+
+            .nav-item.active {
+                border-left: none;
+                border-bottom: 3px solid var(--primary-bright);
+                background: transparent;
+            }
+
+            .main-content {
+                grid-row: 1;
+                grid-template-rows: auto 1fr;
+            }
+
+            .topbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 10px;
+                height: auto;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            #connection-status {
+                display: none;
+            }
+
+            .workspace {
+                padding: 1rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+            }
+
+            .category-select {
+                width: 100%;
+            }
+
+            .movies-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Écran de Connexion -->
+<div id="login-screen">
+    <div class="login-card">
+        <!-- Conteneur qui masque proprement les angles noirs de l'image -->
+        <div class="logo-container">
+            <img src="logo.png" alt="By Gbs Logo" class="brand-logo-img" id="login-logo">
+        </div>
+        <p class="login-subtitle"></p>
+        <form id="login-form">
+            <div class="input-group">
+                <label>URL du Serveur</label>
+                <input type="text" id="server-url" class="focusable" tabindex="1" placeholder="http://serveur.com:8080" required>
+            </div>
+            <div class="input-group">
+                <label>Nom d'utilisateur</label>
+                <input type="text" id="username" class="focusable" tabindex="2" placeholder="Identifiant" required>
+            </div>
+            <div class="input-group">
+                <label>Mot de passe</label>
+                <input type="password" id="password" class="focusable" tabindex="3" placeholder="Mot de passe" required>
+            </div>
+            <button type="submit" id="btn-login" class="btn focusable" tabindex="4"><i class="fa-solid fa-play" style="margin-right: 8px;"></i> Se Connecter</button>
+            <button type="button" class="btn btn-demo focusable" tabindex="5" onclick="loadDemoMode()">Mode Démo TV</button>
+        </form>
+    </div>
+</div>
+
+<!-- Interface Principale -->
+<div id="app-screen">
+    <div class="sidebar">
+        <div class="app-header-logo">
+            <div class="app-header-logo-container">
+                <img src="logo.png" alt="By Gbs Logo">
+            </div>
+        </div>
+        <div class="nav-section-title">Catalogue TV</div>
+        <div class="nav-item focusable active" tabindex="6" onclick="switchTab('vod')">
+            <i class="fa-solid fa-film"></i> <span>Films</span>
+        </div>
+        <div class="nav-item focusable" tabindex="7" onclick="switchTab('live')">
+            <i class="fa-solid fa-tv"></i> <span>Direct TV</span>
+        </div>
+        <div class="nav-item focusable" tabindex="8" onclick="switchTab('series')">
+            <i class="fa-solid fa-layer-group"></i> <span>Séries</span>
+        </div>
+        <div class="nav-item focusable" tabindex="9" onclick="switchTab('favorites')">
+            <i class="fa-solid fa-heart"></i> <span>Favoris</span>
+        </div>
+        <div class="user-info">
+            <div>
+                <div id="user-display-name" style="font-weight: 700; font-size: 1.05rem;">Utilisateur TV</div>
+                <div id="user-status" style="color: #4ade80; font-size: 0.85rem; font-weight: 600;">Abonnement VIP</div>
+            </div>
+            <i class="fa-solid fa-power-off focusable" tabindex="10" style="cursor: pointer; color: var(--primary-bright); font-size: 1.3rem; padding: 0.6rem; border-radius: 10px;" onclick="logout()"></i>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="search-input" class="focusable" tabindex="11" placeholder="Rechercher un film, un genre..." onkeyup="filterChannels()">
+            </div>
+            <div id="connection-status" style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600;">
+                <i class="fa-solid fa-circle" style="color: #4ade80; font-size: 0.75rem; margin-right: 6px;"></i> Serveur Actif
+            </div>
+        </div>
+
+        <div class="workspace">
+            <div class="movies-grid-container">
+                <div class="section-header">
+                    <div class="section-title" id="section-title-text">
+                        <i class="fa-solid fa-fire-flame-curved" style="color: var(--primary-bright);"></i> Derniers Films
+                    </div>
+                    <select class="category-select focusable" tabindex="12" id="category-select" onchange="onCategoryChange()">
+                        <option value="all">Toutes les catégories</option>
+                    </select>
+                </div>
+
+                <div class="movies-grid" id="channel-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lecteur Plein Écran -->
+<div id="player-modal">
+    <button class="close-player-btn focusable" tabindex="100" onclick="closePlayer()"><i class="fa-solid fa-xmark"></i></button>
+    <video id="video-player" controls autoplay></video>
+</div>
+
+<script>
+    let config = { serverUrl: '', username: '', password: '' };
+    let currentTab = 'vod';
+    let categories = [];
+    let streams = [];
+    let hlsPlayer = null;
+
+    const demoMovies = [
+        { stream_id: 1, name: "Avatar: La Voie de l'Eau", category_id: "1", stream_icon: "https://image.tmdb.org/t/p/w500/t6HIqrRA8MO3A3A2mC33v2R34C3.jpg", rating: "8.5", added: "2024", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+        { stream_id: 2, name: "Oppenheimer HD", category_id: "1", stream_icon: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg", rating: "8.9", added: "4K", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+        { stream_id: 3, name: "Spider-Man: Across the Spider-Verse", category_id: "2", stream_icon: "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj7sMFF.jpg", rating: "8.7", added: "Nouveau", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+        { stream_id: 4, name: "Dune: Deuxième Partie", category_id: "2", stream_icon: "https://image.tmdb.org/t/p/w500/czembChX8R4y238R3P2R34C3.jpg", rating: "8.6", added: "Ultra HD", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" }
+    ];
+
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        let rawUrl = document.getElementById('server-url').value.trim();
+        config.username = document.getElementById('username').value.trim();
+        config.password = document.getElementById('password').value.trim();
+
+        if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
+            rawUrl = 'http://' + rawUrl;
+        }
+        config.serverUrl = rawUrl.replace(/\/+$/, '');
+
+        authenticateXtream();
+    });
+
+    async function fetchApi(url) {
+        try {
+            const res = await fetch(url);
+            if (res.ok) return await res.json();
+        } catch (e) {
+            console.warn("Connexion directe échouée, tentative avec le proxy CORS...", e);
+        }
+
+        try {
+            const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+            const res = await fetch(proxyUrl);
+            if (res.ok) return await res.json();
+        } catch (e) {
+            console.error("Erreur avec le Proxy CORS:", e);
+        }
+
+        throw new Error("Impossible de contacter le serveur.");
+    }
+
+    function authenticateXtream() {
+        const btn = document.getElementById('btn-login');
+        btn.innerText = "Connexion en cours...";
+
+        const loginApiUrl = `${config.serverUrl}/player_api.php?username=${encodeURIComponent(config.username)}&password=${encodeURIComponent(config.password)}`;
+
+        fetchApi(loginApiUrl)
+            .then(data => {
+                btn.innerHTML = '<i class="fa-solid fa-play" style="margin-right: 8px;"></i> Se Connecter';
+                if (data && data.user_info && data.user_info.auth === 1) {
+                    document.getElementById('user-display-name').innerText = data.user_info.username || config.username;
+                    showAppScreen();
+                    loadCategories();
+                    loadStreams();
+                } else {
+                    alert("Connexion échouée : Identifiants ou serveur incorrects.");
+                }
+            })
+            .catch(err => {
+                btn.innerHTML = '<i class="fa-solid fa-play" style="margin-right: 8px;"></i> Se Connecter';
+                alert("Impossible de contacter le serveur. Vérifiez l'URL du serveur et votre connexion internet.");
+            });
+    }
+
+    function loadDemoMode() {
+        document.getElementById('user-display-name').innerText = "Mode Démo TV";
+        showAppScreen();
+
+        const catSelect = document.getElementById('category-select');
+        catSelect.innerHTML = '<option value="all">Toutes les catégories</option><option value="1">Blockbusters HD</option><option value="2">Nouveautés 2024</option>';
+
+        streams = demoMovies;
+        renderMoviesGrid(streams);
+    }
+
+    function showAppScreen() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-screen').style.display = 'grid';
+        setTimeout(() => {
+            const firstNav = document.querySelector('.nav-item.active');
+            if (firstNav) firstNav.focus();
+        }, 300);
+    }
+
+    function logout() {
+        closePlayer();
+        document.getElementById('app-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'flex';
+    }
+
+    function loadCategories() {
+        let action = 'get_vod_categories';
+        if (currentTab === 'live') action = 'get_live_categories';
+        if (currentTab === 'series') action = 'get_series_categories';
+
+        const url = `${config.serverUrl}/player_api.php?username=${encodeURIComponent(config.username)}&password=${encodeURIComponent(config.password)}&action=${action}`;
+
+        fetchApi(url)
+            .then(data => {
+                categories = data || [];
+                const catSelect = document.getElementById('category-select');
+                catSelect.innerHTML = '<option value="all">Toutes les catégories</option>';
+                categories.forEach(cat => {
+                    catSelect.innerHTML += `<option value="${cat.category_id}">${cat.category_name}</option>`;
+                });
+            })
+            .catch(err => console.error("Erreur chargement catégories:", err));
+    }
+
+    function loadStreams() {
+        let action = 'get_vod_streams';
+        if (currentTab === 'live') action = 'get_live_streams';
+        if (currentTab === 'series') action = 'get_series';
+
+        const url = `${config.serverUrl}/player_api.php?username=${encodeURIComponent(config.username)}&password=${encodeURIComponent(config.password)}&action=${action}`;
+
+        fetchApi(url)
+            .then(data => {
+                if (Array.isArray(data)) {
+                    streams = data.sort((a, b) => (b.added || 0) - (a.added || 0));
+                } else {
+                    streams = [];
+                }
+                renderMoviesGrid(streams);
+            })
+            .catch(err => console.error("Erreur chargement des flux:", err));
+    }
+
+    function renderMoviesGrid(list) {
+        const container = document.getElementById('channel-list');
+        container.innerHTML = '';
+
+        list.forEach((item, index) => {
+            const poster = item.stream_icon ? item.stream_icon : 'logo.png';
+            const rating = item.rating ? item.rating : '8.0';
+
+            const card = document.createElement('div');
+            card.className = 'movie-card focusable';
+            card.tabIndex = 20 + index;
+            card.innerHTML = `
+                <img class="movie-poster" src="${poster}" onerror="this.src='logo.png'" />
+                <div class="movie-info-overlay">
+                    <div class="movie-title">${item.name}</div>
+                    <div class="movie-meta">
+                        <span><i class="fa-solid fa-star" style="color: #f59e0b; margin-right: 4px;"></i> ${rating}</span>
+                        <span class="movie-badge">Mis à jour</span>
+                    </div>
+                </div>
+            `;
+            card.onclick = () => playStream(item);
+            card.onkeydown = (e) => {
+                if (e.key === 'Enter') playStream(item);
+            };
+            container.appendChild(card);
+        });
+    }
+
+    function playStream(item) {
+        let streamUrl = item.url;
+
+        if (!streamUrl) {
+            const ext = currentTab === 'live' ? 'm3u8' : 'mp4';
+            streamUrl = `${config.serverUrl}/movie/${config.username}/${config.password}/${item.stream_id}.${ext}`;
+        }
+
+        const modal = document.getElementById('player-modal');
+        const video = document.getElementById('video-player');
+        modal.style.display = 'block';
+
+        if (Hls.isSupported() && streamUrl.endsWith('.m3u8')) {
+            if (hlsPlayer) hlsPlayer.destroy();
+            hlsPlayer = new Hls();
+            hlsPlayer.loadSource(streamUrl);
+            hlsPlayer.attachMedia(video);
+            hlsPlayer.on(Hls.Events.MANIFEST_PARSED, function() {
+                video.play();
+            });
+        } else {
+            video.src = streamUrl;
+            video.play();
+        }
+
+        document.querySelector('.close-player-btn').focus();
+    }
+
+    function closePlayer() {
+        const modal = document.getElementById('player-modal');
+        const video = document.getElementById('video-player');
+        video.pause();
+        if (hlsPlayer) hlsPlayer.destroy();
+        modal.style.display = 'none';
+    }
+
+    function filterChannels() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const filtered = streams.filter(s => s.name.toLowerCase().includes(query));
+        renderMoviesGrid(filtered);
+    }
+
+    function onCategoryChange() {
+        const catId = document.getElementById('category-select').value;
+        if (catId === 'all') {
+            renderMoviesGrid(streams);
+        } else {
+            const filtered = streams.filter(s => s.category_id === catId);
+            renderMoviesGrid(filtered);
+        }
+    }
+
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('active');
+        }
+
+        const titleText = document.getElementById('section-title-text');
+        if (tab === 'vod') {
+            titleText.innerHTML = `<i class="fa-solid fa-fire-flame-curved" style="color: var(--primary-bright);"></i> Derniers Films`;
+            document.getElementById('search-input').placeholder = "Rechercher un film...";
+        } else if (tab === 'live') {
+            titleText.innerHTML = `<i class="fa-solid fa-tv" style="color: var(--primary-bright);"></i> Direct TV`;
+            document.getElementById('search-input').placeholder = "Rechercher une chaîne...";
+        } else if (tab === 'series') {
+            titleText.innerHTML = `<i class="fa-solid fa-layer-group" style="color: var(--primary-bright);"></i> Séries TV`;
+            document.getElementById('search-input').placeholder = "Rechercher une série...";
+        }
+
+        if (config.username) {
+            loadCategories();
+            loadStreams();
+        }
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' || e.key === 'Back' || e.keyCode === 461 || e.keyCode === 27) {
+            if (document.getElementById('player-modal').style.display === 'block') {
+                closePlayer();
+                e.preventDefault();
+            }
+            return;
+        }
+
+        const focusables = Array.from(document.querySelectorAll('.focusable:not([style*="display: none"])'));
+        const index = focusables.indexOf(document.activeElement);
+
+        if (index === -1) {
+            if (focusables.length > 0) focusables[0].focus();
+            return;
+        }
+
+        if (e.key === 'ArrowRight') {
+            if (index < focusables.length - 1) {
+                focusables[index + 1].focus();
+                e.preventDefault();
+            }
+        } else if (e.key === 'ArrowLeft') {
+            if (index > 0) {
+                focusables[index - 1].focus();
+                e.preventDefault();
+            }
+        } else if (e.key === 'ArrowDown') {
+            if (index + 4 < focusables.length) {
+                focusables[index + 4].focus();
+                e.preventDefault();
+            }
+        } else if (index - 4 >= 0) {
+            focusables[index - 4].focus();
+            e.preventDefault();
+        }
+    });
+    // ==========================================
+// 1. VARIABLES GLOBALES (à adapter selon votre projet)
+// ==========================================
+currentTab = 'vod'; // 'vod' par défaut (films), ou 'live', 'series'
+streams = [];
+
+// ==========================================
+// 2. FONCTION DE CONNEXION (EXTREAM CODES)
+// ==========================================
+function authenticateXtream() {
+    const btn = document.getElementById('btn-login');
+    if (btn) btn.innerText = "Connexion en cours...";
+
+    const loginApiUrl = `${config.serverUrl}/player_api.php?username=${encodeURIComponent(config.username)}&password=${encodeURIComponent(config.password)}`;
+
+    fetchApi(loginApiUrl)
+        .then(data => {
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-play" style="margin-right: 8px;"></i> Se Connecter';
+
+            if (data && data.user_info && data.user_info.auth === 1) {
+                const displayName = document.getElementById('user-display-name');
+                if (displayName) {
+                    displayName.innerText = data.user_info.username || config.username;
+                }
+
+                // Fonctions d'affichage de l'app (assurez-vous qu'elles existent dans votre projet)
+                if (typeof showAppScreen === 'function') showAppScreen();
+                if (typeof loadCategories === 'function') loadCategories();
+
+                // Chargement initial des flux après connexion
+                loadStreams();
+            } else {
+                alert("Connexion échouée : Identifiants ou serveur incorrects.");
+            }
+        })
+        .catch(err => {
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-play" style="margin-right: 8px;"></i> Se Connecter';
+            alert("Erreur de connexion au serveur. Vérifiez votre URL.");
+        });
+}
+
+// ==========================================
+// 3. FONCTION DE CHARGEMENT DES FLUX (FILMS / LIVE / SÉRIES)
+// ==========================================
+function loadStreams() {
+    let action = 'get_vod_streams';
+    if (currentTab === 'live') action = 'get_live_streams';
+    if (currentTab === 'series') action = 'get_series';
+
+    const url = `${config.serverUrl}/player_api.php?username=${encodeURIComponent(config.username)}&password=${encodeURIComponent(config.password)}&action=${action}`;
+
+    fetchApi(url)
+        .then(data => {
+            console.log("Données reçues :", data);
+
+            if (Array.isArray(data)) {
+                streams = data;
+            } else if (data && typeof data === 'object') {
+                streams = Object.values(data);
+            } else {
+                streams = [];
+            }
+
+            const channelList = document.getElementById('channel-list');
+            if (channelList) {
+                if (streams.length === 0) {
+                    channelList.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">Aucun contenu trouvé sur ce serveur.</div>`;
+                } else {
+                    // Assurez-vous que renderMoviesGrid existe, ou remplacez par votre fonction d'affichage
+                    if (typeof renderMoviesGrid === 'function') {
+                        renderMoviesGrid(streams);
+                    }
+                }
+            }
+        })
+        .catch(err => {
+            console.error("Erreur chargement des flux:", err);
+            const channelList = document.getElementById('channel-list');
+            if (channelList) {
+                channelList.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--primary-bright);">Erreur lors du chargement des contenus.</div>`;
+            }
+        });
+}
+
+// ==========================================
+// 4. GESTION DE LA NAVIGATION PAR ONGLETS
+// ==========================================
+// (Ces lignes écoutent les clics sur vos boutons d'onglets si leurs IDs existent)
+document.addEventListener('DOMContentLoaded', () => {
+    const tabVod = document.getElementById('tab-vod');
+    const tabLive = document.getElementById('tab-live');
+    const tabSeries = document.getElementById('tab-series');
+
+    if (tabVod) {
+        tabVod.addEventListener('click', () => {
+            currentTab = 'vod';
+            loadStreams();
+        });
+    }
+
+    if (tabLive) {
+        tabLive.addEventListener('click', () => {
+            currentTab = 'live';
+            loadStreams();
+        });
+    }
+
+    if (tabSeries) {
+        tabSeries.addEventListener('click', () => {
+            currentTab = 'series';
+            loadStreams();
+        });
+    }
+});
+</script>
+</body>
+</html>
