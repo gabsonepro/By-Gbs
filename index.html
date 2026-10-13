@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>By Gbs - Premium TV & Mobile</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <title>By Gbs</title>
+    
+    <!-- Polices et styles externes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+    
+    <!-- Lien vers votre configuration mobile -->
+    <link rel="manifest" href="manifest.json">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
         :root {
             --bg-dark: #050508;
             --bg-card: rgba(22, 22, 34, 0.75);
@@ -84,13 +88,12 @@
             margin: auto;
         }
 
-        /* CONTENEUR QUI MASQUE LES BORDS CARRÉS NOIRS */
         .logo-container {
             width: 110px;
             height: 110px;
             margin: 0 auto 1.5rem auto;
             border-radius: 30px;
-            overflow: hidden; /* Coupe tout ce qui dépasse pour ne garder que le centre */
+            overflow: hidden;
             box-shadow: 0 0 25px rgba(255, 18, 77, 0.7);
             background: #000;
             display: flex;
@@ -102,7 +105,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transform: scale(1.35); /* Zoom pour écarter le noir des bords */
+            transform: scale(1.35);
         }
 
         .login-subtitle {
@@ -510,7 +513,12 @@
     </style>
 </head>
 <body>
+    <!-- Le reste de votre code IPTV -->
 
+    <!-- Script JavaScript externe -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</body>
+</html>
 <!-- Écran de Connexion -->
 <div id="login-screen">
     <div class="login-card">
