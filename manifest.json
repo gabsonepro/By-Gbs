@@ -1,0 +1,12 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "By.Gbs",
+  "orientation": "any",
+  "scope": "/By-Gbs/",
+  "short_name": "By.Gbs",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "lang": "fr"
+} 
